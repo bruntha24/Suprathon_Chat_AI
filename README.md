@@ -82,7 +82,7 @@ The frontend is a modern web application built with Vite, React, TypeScript, and
    npm run dev
    ```
 
-   The frontend will be accessible at [http://localhost:5173](http://localhost:3000).
+   The frontend will be accessible at [http://localhost:3000](http://localhost:3000).
 
 ---
 
