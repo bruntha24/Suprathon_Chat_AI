@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { ArrowDown, X, Maximize2, Minimize2, Bot as BotIcon, SendHorizontal, Volume2, VolumeX } from "lucide-react";
+import { useChatSound } from "@/hooks/useChatSound";
 
 interface Message {
   id: number;
@@ -69,7 +70,7 @@ const ChatWidget = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const { isSoundEnabled, toggleSound, playNotification } = useChatSound();
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -121,12 +122,14 @@ const ChatWidget = () => {
         ...prev,
         { id: Date.now() + 1, type: "bot", text: res.data.reply || "Sorry, no answer.", timestamp: new Date() },
       ]);
+      playNotification();
     } catch (error) {
       console.error("Chat API error:", error);
       setMessages((prev) => [
         ...prev,
         { id: Date.now() + 1, type: "bot", text: "Oops! Something went wrong. Try again.", timestamp: new Date() },
       ]);
+      playNotification();
     } finally {
       setLoading(false);
     }
@@ -197,11 +200,11 @@ const ChatWidget = () => {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  onClick={toggleSound}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted"
-                  title={soundEnabled ? "Mute" : "Unmute"}
+                  title={isSoundEnabled ? "Mute" : "Unmute"}
                 >
-                  {soundEnabled ? <Volume2 size={18} className="text-foreground" /> : <VolumeX size={18} className="text-foreground" />}
+                  {isSoundEnabled ? <Volume2 size={18} className="text-foreground" /> : <VolumeX size={18} className="text-foreground" />}
                 </button>
                 <button
                   onClick={() => setOpen(false)}
