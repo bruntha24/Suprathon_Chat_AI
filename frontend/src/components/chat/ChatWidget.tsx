@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import { ArrowUp, X, ArrowLeft, Maximize2, MoreHorizontal, Bot as BotIcon, SendHorizontal } from "lucide-react";
+import { ArrowDown, X, ArrowLeft, Maximize2, MoreHorizontal, Bot as BotIcon, SendHorizontal } from "lucide-react";
 
 interface Message {
   id: number;
@@ -289,7 +289,7 @@ const ChatWidget = () => {
                 onClick={scrollToBottom}
                 className="absolute right-4 bottom-24 bg-primary h-8 w-8 rounded-full text-white flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors"
               >
-                <ArrowUp size={14} />
+                <ArrowDown size={14} />
               </button>
             )}
           </div>
