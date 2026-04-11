@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import { ArrowDown, X, ArrowLeft, Maximize2, MoreHorizontal, Bot as BotIcon, SendHorizontal } from "lucide-react";
+import { ArrowDown, X, Maximize2, Minimize2, Bot as BotIcon, SendHorizontal, Volume2, VolumeX } from "lucide-react";
 
 interface Message {
   id: number;
@@ -68,6 +68,8 @@ const ChatWidget = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -174,24 +176,32 @@ const ChatWidget = () => {
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
           <div
-            className="relative w-[440px] flex flex-col rounded-[24px] bg-background shadow-xl overflow-hidden"
-            style={{ height: "min(90vh, 680px)" }}
+            className={`relative flex flex-col bg-background shadow-xl overflow-hidden transition-all duration-500 ease-in-out ${
+              isMaximized
+                ? "w-full h-full sm:w-[820px] sm:h-[min(85vh,800px)]"
+                : "w-full h-full sm:w-[440px] sm:h-[min(80vh,700px)]"
+            } ${isMaximized ? "sm:rounded-[24px]" : "sm:rounded-[24px]"} rounded-none`}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <div className="flex gap-2">
-                <button className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted">
-                  <ArrowLeft size={18} className="text-foreground" />
-                </button>
-                <button className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted">
-                  <Maximize2 size={16} className="text-foreground" />
+                <button
+                  onClick={() => setIsMaximized(!isMaximized)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted"
+                  title={isMaximized ? "Shrink" : "Expand"}
+                >
+                  {isMaximized ? <Minimize2 size={16} className="text-foreground" /> : <Maximize2 size={16} className="text-foreground" />}
                 </button>
               </div>
               <div className="flex gap-2">
-                <button className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted">
-                  <MoreHorizontal size={18} className="text-foreground" />
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-chat-icon transition-colors hover:bg-muted"
+                  title={soundEnabled ? "Mute" : "Unmute"}
+                >
+                  {soundEnabled ? <Volume2 size={18} className="text-foreground" /> : <VolumeX size={18} className="text-foreground" />}
                 </button>
                 <button
                   onClick={() => setOpen(false)}
