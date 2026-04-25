@@ -62,8 +62,8 @@ const renderMessageWithLinks = (text: string) => {
 // --- 2. SUB-COMPONENTS ---
 
 const BotAvatar = () => (
-  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-purple-200 border border-purple-300 shadow-sm overflow-hidden">
-    <RobotAnimation size={26} />
+  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-sm overflow-hidden">
+    <RobotAnimation size={30} />
   </div>
 );
 
@@ -212,17 +212,17 @@ const ChatWidget = () => {
           position: absolute;
           inset: 0;
           border-radius: 9999px;
-          background: rgba(124, 58, 237, 0.45);
+          background: rgba(59, 130, 246, 0.45);
           animation: launcher-pulse-ring 2s ease-out infinite;
           pointer-events: none;
         }
         .chat-launcher-btn {
           position: relative;
-          height: 60px;
-          width: 60px;
+          height: 64px;
+          width: 64px;
           border-radius: 9999px;
-          background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-          box-shadow: 0 8px 24px rgba(124, 58, 237, 0.55), 0 2px 8px rgba(0,0,0,0.15);
+          background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+          box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45), 0 2px 8px rgba(0,0,0,0.15);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -233,16 +233,16 @@ const ChatWidget = () => {
         }
         .chat-launcher-btn:hover {
           transform: scale(1.1);
-          box-shadow: 0 12px 32px rgba(124, 58, 237, 0.7), 0 2px 8px rgba(0,0,0,0.2);
+          box-shadow: 0 12px 32px rgba(37, 99, 235, 0.6), 0 2px 8px rgba(0,0,0,0.2);
         }
         .chat-launcher-btn:active { transform: scale(0.97); }
         .chat-launcher-tooltip {
           position: absolute;
-          right: 68px;
+          right: 72px;
           top: 50%;
           transform: translateY(-50%);
-          background: #1e1b4b;
-          color: #e0e7ff;
+          background: #172554;
+          color: #eff6ff;
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 0.02em;
@@ -261,7 +261,7 @@ const ChatWidget = () => {
           top: 50%;
           transform: translateY(-50%);
           border: 6px solid transparent;
-          border-left-color: #1e1b4b;
+          border-left-color: #172554;
         }
         .chat-launcher:hover .chat-launcher-tooltip { opacity: 1; }
       `}</style>
@@ -270,14 +270,14 @@ const ChatWidget = () => {
       {!open && (
         <div className="chat-launcher">
           <span className="chat-launcher-ring" aria-hidden="true" />
-          <button
-            id="chat-launcher-btn"
-            aria-label="Open chat support"
-            onClick={() => setOpen(true)}
-            className="chat-launcher-btn"
-          >
-            <RobotAnimation size={44} />
-          </button>
+            <button
+              id="chat-launcher-btn"
+              aria-label="Open chat support"
+              onClick={() => setOpen(true)}
+              className="chat-launcher-btn"
+            >
+              <RobotAnimation size={52} />
+            </button>
           <span className="chat-launcher-tooltip">Chat with us!</span>
         </div>
       )}
