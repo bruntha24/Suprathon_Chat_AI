@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import { ArrowDown, X, Maximize2, Minimize2, Bot as BotIcon, SendHorizontal, Volume2, VolumeX } from "lucide-react";
+import { ArrowDown, X, Maximize2, Minimize2, SendHorizontal, Volume2, VolumeX } from "lucide-react";
+import RobotAnimation from "./RobotAnimation";
 import { useChatSound } from "@/hooks/useChatSound";
 
 interface Message {
@@ -61,8 +62,8 @@ const renderMessageWithLinks = (text: string) => {
 // --- 2. SUB-COMPONENTS ---
 
 const BotAvatar = () => (
-  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary">
-    <BotIcon size={14} className="text-primary-foreground" />
+  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-sm overflow-hidden">
+    <RobotAnimation size={30} />
   </div>
 );
 
@@ -191,16 +192,94 @@ const ChatWidget = () => {
         }
         .chat-bubble-text { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
         .chat-textarea { resize: none; overflow-y: auto; min-height: 36px; max-height: 120px; line-height: 1.5; }
+
+        /* Floating launcher styles */
+        @keyframes launcher-pulse-ring {
+          0%   { transform: scale(1);    opacity: 0.7; }
+          70%  { transform: scale(1.55); opacity: 0;   }
+          100% { transform: scale(1.55); opacity: 0;   }
+        }
+        .chat-launcher {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 50;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .chat-launcher-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 9999px;
+          background: rgba(59, 130, 246, 0.45);
+          animation: launcher-pulse-ring 2s ease-out infinite;
+          pointer-events: none;
+        }
+        .chat-launcher-btn {
+          position: relative;
+          height: 64px;
+          width: 64px;
+          border-radius: 9999px;
+          background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+          box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45), 0 2px 8px rgba(0,0,0,0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          border: none;
+          outline: none;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .chat-launcher-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 12px 32px rgba(37, 99, 235, 0.6), 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .chat-launcher-btn:active { transform: scale(0.97); }
+        .chat-launcher-tooltip {
+          position: absolute;
+          right: 72px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: #172554;
+          color: #eff6ff;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          padding: 6px 12px;
+          border-radius: 8px;
+          white-space: nowrap;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        }
+        .chat-launcher-tooltip::after {
+          content: '';
+          position: absolute;
+          left: 100%;
+          top: 50%;
+          transform: translateY(-50%);
+          border: 6px solid transparent;
+          border-left-color: #172554;
+        }
+        .chat-launcher:hover .chat-launcher-tooltip { opacity: 1; }
       `}</style>
 
       {/* Launcher */}
       {!open && (
-        <button 
-          onClick={() => setOpen(true)} 
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary flex items-center justify-center shadow-lg hover:scale-110 transition-transform text-white"
-        >
-          <BotIcon size={28} />
-        </button>
+        <div className="chat-launcher">
+          <span className="chat-launcher-ring" aria-hidden="true" />
+            <button
+              id="chat-launcher-btn"
+              aria-label="Open chat support"
+              onClick={() => setOpen(true)}
+              className="chat-launcher-btn"
+            >
+              <RobotAnimation size={52} />
+            </button>
+          <span className="chat-launcher-tooltip">Chat with us!</span>
+        </div>
       )}
 
       {/* Window */}

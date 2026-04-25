@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waving Robot — Chat Button Preview</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 60px;
+      background: #0f0a1e;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e0e7ff;
+    }
+
+    h1 { font-size: 1.4rem; letter-spacing: 0.04em; opacity: 0.7; }
+
+    /* ── Full-size preview ─────────────────────────────────────────────── */
+    .preview-full {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .label { font-size: 0.75rem; opacity: 0.5; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* Transparent-bg box */
+    .robot-stage {
+      width: 260px;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed rgba(124, 58, 237, 0.35);
+      border-radius: 16px;
+    }
+
+    /* ── Button-size preview ───────────────────────────────────────────── */
+    .preview-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(1);    opacity: 0.7; }
+      70%  { transform: scale(1.55); opacity: 0;   }
+      100% { transform: scale(1.55); opacity: 0;   }
+    }
+
+    .chat-btn-demo {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .chat-btn-demo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 36px rgba(124, 58, 237, 0.8);
+    }
+    .pulse-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.5);
+      animation: pulse-ring 2s ease-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🤖 Waving Robot — Animation Preview</h1>
+
+  <!-- ── FULL SIZE ──────────────────────────────────────────────────── -->
+  <div class="preview-full">
+    <span class="label">Full size (220 × 220 px)</span>
+    <div class="robot-stage">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="220" height="220"
+           aria-label="Waving robot" role="img" style="overflow:visible">
+        <style>
+          @keyframes rw-arm  {
+            0%   { transform: rotate(0deg);   }
+            20%  { transform: rotate(-30deg); }
+            40%  { transform: rotate(10deg);  }
+            60%  { transform: rotate(-26deg); }
+            80%  { transform: rotate(8deg);   }
+            100% { transform: rotate(0deg);   }
+          }
+          @keyframes rw-ant  { 0%,100%{opacity:1;r:4} 50%{opacity:.5;r:5} }
+          @keyframes rw-blink{ 0%,90%,100%{transform:scaleY(1)} 95%{transform:scaleY(.08)} }
+          @keyframes rw-glow { 0%,100%{opacity:.75} 50%{opacity:1} }
+
+          .rw-arm  { transform-origin:138px 108px; animation:rw-arm 2.4s ease-in-out infinite; }
+          .rw-el   { animation:rw-blink 4s ease-in-out infinite .3s; }
+          .rw-er   { animation:rw-blink 4s ease-in-out infinite .3s; transform-origin:118px 75px; }
+          .rw-ad   { animation:rw-ant  2.4s ease-in-out infinite; }
+          .rw-ht   { animation:rw-glow 2.4s ease-in-out infinite; }
+        </style>
+        <defs>
+          <linearGradient id="p-body" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#ddd6fe"/>
+          </linearGradient>
+          <linearGradient id="p-screen" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#1e1b4b"/>
+            <stop offset="100%" stop-color="#4c1d95"/>
+          </linearGradient>
+          <filter id="p-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="p-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#7c3aed" flood-opacity=".35"/>
+          </filter>
+        </defs>
+
+        <!-- Legs -->
+        <rect x="72"  y="182" width="22" height="28" rx="10" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+        <ellipse cx="83"  cy="210" rx="14" ry="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect x="106" y="182" width="22" height="28" rx="10" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+        <ellipse cx="117" cy="210" rx="14" ry="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <circle cx="83"  cy="186" r="4" fill="#7c3aed" opacity=".7"/>
+        <circle cx="117" cy="186" r="4" fill="#7c3aed" opacity=".7"/>
+
+        <!-- Torso -->
+        <rect x="62" y="108" width="76" height="76" rx="16" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2.5" filter="url(#p-shadow)"/>
+        <rect x="62"  y="120" width="6"  height="52" rx="3" fill="#7c3aed" opacity=".5"/>
+        <rect x="132" y="120" width="6"  height="52" rx="3" fill="#7c3aed" opacity=".5"/>
+
+        <!-- Screen -->
+        <rect x="74" y="116" width="52" height="62" rx="8" fill="url(#p-screen)" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="74" y="116" width="52" height="62" rx="8" fill="none" stroke="#c4b5fd" stroke-width="2.5" opacity=".5"/>
+        <text x="100" y="153" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif"
+              font-weight="900" font-size="22" fill="#d946ef" class="rw-ht" filter="url(#p-glow)">HI!</text>
+
+        <!-- Left arm (static) -->
+        <rect x="42" y="110" width="20" height="40" rx="10" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+        <rect x="44" y="148" width="18" height="30" rx="9"  fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="53" cy="182" r="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <line x1="47" y1="176" x2="44" y2="170" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+        <line x1="53" y1="173" x2="53" y2="167" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+        <line x1="59" y1="176" x2="62" y2="170" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+
+        <!-- Head -->
+        <rect x="90" y="98" width="20" height="14" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <ellipse cx="100" cy="72" rx="46" ry="40" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2.5" filter="url(#p-shadow)"/>
+        <ellipse cx="100" cy="76" rx="34" ry="26" fill="#1e1b4b" opacity=".85"/>
+        <ellipse cx="100" cy="74" rx="32" ry="24" fill="#0f0a1e"/>
+
+        <!-- Eyes -->
+        <circle cx="82"  cy="75" r="10" fill="#7c3aed"/>
+        <circle cx="118" cy="75" r="10" fill="#7c3aed"/>
+        <circle cx="82"  cy="75" r="6"  fill="#d946ef" class="rw-el" style="transform-origin:82px 75px"/>
+        <circle cx="118" cy="75" r="6"  fill="#d946ef" class="rw-er"/>
+        <circle cx="85"  cy="72" r="2"  fill="white" opacity=".7"/>
+        <circle cx="121" cy="72" r="2"  fill="white" opacity=".7"/>
+
+        <!-- Ears -->
+        <circle cx="54"  cy="72" r="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <circle cx="54"  cy="72" r="4" fill="#7c3aed"/>
+        <circle cx="146" cy="72" r="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <circle cx="146" cy="72" r="4" fill="#7c3aed"/>
+
+        <!-- Antenna -->
+        <line x1="100" y1="32" x2="100" y2="54" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="28" r="7" fill="#7c3aed"/>
+        <circle cx="100" cy="28" r="4" fill="#d946ef" class="rw-ad" filter="url(#p-glow)"/>
+
+        <!-- Animated right arm -->
+        <g class="rw-arm">
+          <rect x="138" y="110" width="20" height="40" rx="10" fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+          <circle cx="148" cy="150" r="5" fill="#7c3aed" opacity=".6"/>
+          <rect x="140" y="148" width="18" height="32" rx="9"  fill="url(#p-body)" stroke="#7c3aed" stroke-width="2"/>
+          <circle cx="149" cy="184" r="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+          <line x1="142" y1="177" x2="138" y2="170" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="147" y1="174" x2="146" y2="167" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="153" y1="174" x2="154" y2="167" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="157" y1="177" x2="161" y2="171" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── BUTTON SIZE ──────────────────────────────────────────────────── -->
+  <div class="preview-button">
+    <span class="label">As seen in floating chat button (64 × 64 px)</span>
+    <div class="chat-btn-demo" title="Open chat">
+      <div class="pulse-ring"></div>
+      <!-- Same SVG, scaled to 44px to fit inside the 64px button -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="44" height="44"
+           aria-hidden="true" style="overflow:visible">
+        <style>
+          @keyframes rwb-arm  {
+            0%   { transform: rotate(0deg);   }
+            20%  { transform: rotate(-30deg); }
+            40%  { transform: rotate(10deg);  }
+            60%  { transform: rotate(-26deg); }
+            80%  { transform: rotate(8deg);   }
+            100% { transform: rotate(0deg);   }
+          }
+          @keyframes rwb-glow { 0%,100%{opacity:.75} 50%{opacity:1} }
+          .rwb-arm { transform-origin:138px 108px; animation:rwb-arm 2.4s ease-in-out infinite; }
+          .rwb-ht  { animation:rwb-glow 2.4s ease-in-out infinite; }
+        </style>
+        <defs>
+          <linearGradient id="pb-body" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#ddd6fe"/>
+          </linearGradient>
+          <linearGradient id="pb-screen" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#1e1b4b"/>
+            <stop offset="100%" stop-color="#4c1d95"/>
+          </linearGradient>
+          <filter id="pb-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect x="72"  y="182" width="22" height="28" rx="10" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+        <ellipse cx="83"  cy="210" rx="14" ry="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect x="106" y="182" width="22" height="28" rx="10" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+        <ellipse cx="117" cy="210" rx="14" ry="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect x="62" y="108" width="76" height="76" rx="16" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2.5"/>
+        <rect x="74" y="116" width="52" height="62" rx="8" fill="url(#pb-screen)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="100" y="153" text-anchor="middle" font-family="'Arial Black',Arial,sans-serif"
+              font-weight="900" font-size="22" fill="#d946ef" class="rwb-ht" filter="url(#pb-glow)">HI!</text>
+        <rect x="42" y="110" width="20" height="40" rx="10" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+        <rect x="44" y="148" width="18" height="30" rx="9"  fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="53" cy="182" r="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <rect x="90" y="98" width="20" height="14" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <ellipse cx="100" cy="72" rx="46" ry="40" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2.5"/>
+        <ellipse cx="100" cy="74" rx="32" ry="24" fill="#0f0a1e"/>
+        <circle cx="82"  cy="75" r="10" fill="#7c3aed"/>
+        <circle cx="118" cy="75" r="10" fill="#7c3aed"/>
+        <circle cx="82"  cy="75" r="6"  fill="#d946ef"/>
+        <circle cx="118" cy="75" r="6"  fill="#d946ef"/>
+        <circle cx="85"  cy="72" r="2"  fill="white" opacity=".7"/>
+        <circle cx="121" cy="72" r="2"  fill="white" opacity=".7"/>
+        <line x1="100" y1="32" x2="100" y2="54" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="28" r="7" fill="#7c3aed"/>
+        <circle cx="100" cy="28" r="4" fill="#d946ef" filter="url(#pb-glow)"/>
+        <g class="rwb-arm">
+          <rect x="138" y="110" width="20" height="40" rx="10" fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+          <rect x="140" y="148" width="18" height="32" rx="9"  fill="url(#pb-body)" stroke="#7c3aed" stroke-width="2"/>
+          <circle cx="149" cy="184" r="11" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+          <line x1="142" y1="177" x2="138" y2="170" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="147" y1="174" x2="146" y2="167" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="153" y1="174" x2="154" y2="167" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <line x1="157" y1="177" x2="161" y2="171" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+</body>
+</html>
