@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-import { ArrowDown, X, Maximize2, Minimize2, SendHorizontal, Volume2, VolumeX } from "lucide-react";
-import RobotAnimation from "./RobotAnimation";
+import { ArrowDown, Bot as BotIcon, SendHorizontal, X, MessageSquare } from "lucide-react";
 import { useChatSound } from "@/hooks/useChatSound";
+import ChatHeader from "./ChatHeader"; 
 
 interface Message {
   id: number;
@@ -14,26 +14,27 @@ interface Message {
   suggestions?: string[];
 }
 
-// --- 1. STATIC CONSTANTS & HELPERS (Defined outside to fix scope errors) ---
-
+// --- STATIC CONSTANTS & HELPERS ---
 const SUGGESTION_POOL = [
   "Who can participate in Suprathon?",
   "What are the submission requirements?",
   "What were the judging criteria?",
   "Who were the judges?",
-  "Will I get a certificate for participating?",
-  "Will I get an internship?",
+  "Will I get a certificate?",
   "Is plagiarism allowed?",
+  "How to register for the Hackathon?",
+  "Is registration free?",
   "Who can I contact for doubts or technical issues?",
-  "Will the event be fully online?",
+  "Is it fully online?",
+  "Can participants register for multiple domains?",
+  "Is a college ID or Bonafide certificate required?",
   "Can participants change their domain after registering?",
   "Can beginners win SuPrathon?",
-  "What are the prizes?",
   "What mentorship is available during the hackathon?",
-  "What type of project has the best chance of winning?",
+  "Which projects have a high chance to win?"
 ];
 
-const getRandomSuggestions = (count = 4, exclude?: string) => {
+const getRandomSuggestions = (count = 3, exclude?: string) => {
   const filtered = exclude 
     ? SUGGESTION_POOL.filter(s => s !== exclude) 
     : SUGGESTION_POOL;
@@ -50,7 +51,7 @@ const renderMessageWithLinks = (text: string) => {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return text.split(urlRegex).map((part, index) =>
     urlRegex.test(part) ? (
-      <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:opacity-80 transition break-all text-primary">
+      <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold underline underline-offset-4 decoration-blue-200 hover:decoration-blue-600 transition-all">
         {part}
       </a>
     ) : (
@@ -59,23 +60,22 @@ const renderMessageWithLinks = (text: string) => {
   );
 };
 
-// --- 2. SUB-COMPONENTS ---
-
+// --- SUB-COMPONENTS ---
 const BotAvatar = () => (
-  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-sm overflow-hidden">
-    <RobotAnimation size={30} />
+  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 shadow-lg shadow-zinc-200">
+    <BotIcon size={18} className="text-blue-500" />
   </div>
 );
 
 const TypingIndicator = () => (
-  <div className="flex gap-2 items-start">
+  <div className="flex gap-3 items-start px-2">
     <BotAvatar />
-    <div className="bg-muted p-3" style={{ borderRadius: "18px 18px 18px 4px" }}>
-      <div className="flex items-center gap-1 h-4">
+    <div className="bg-zinc-100/80 backdrop-blur-sm p-4 rounded-3xl rounded-tl-none shadow-sm border border-white">
+      <div className="flex items-center gap-1.5 h-3">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="block h-2 w-2 rounded-full bg-muted-foreground animate-bounce"
+            className="block h-1.5 w-1.5 rounded-full bg-zinc-400 animate-bounce"
             style={{ animationDelay: `${i * 0.2}s` }}
           />
         ))}
@@ -84,18 +84,18 @@ const TypingIndicator = () => (
   </div>
 );
 
-// --- 3. MAIN COMPONENT ---
-
+// --- MAIN COMPONENT ---
 const ChatWidget = () => {
   const [open, setOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true); 
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       type: "bot",
-      text: "Hi! I'm your AI Assistant. How can I help you today?",
+      text: "Hello! I'm your Suprathon guide. How can I help you today?",
       timestamp: new Date(),
-      suggestions: ["How to apply?", "Team size", "What are the domains?"]
+      suggestions: ["Team size", "Domain", "Prize Pool"]
     },
   ]);
   const [input, setInput] = useState("");
@@ -108,6 +108,7 @@ const ChatWidget = () => {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // --- SCROLL LOGIC ---
   const scrollToBottom = useCallback(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -116,6 +117,7 @@ const ChatWidget = () => {
     scrollToBottom();
   }, [messages, loading, scrollToBottom]);
 
+  // --- TEXTAREA AUTO-RESIZE ---
   const resizeTextarea = useCallback(() => {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -144,178 +146,137 @@ const ChatWidget = () => {
       timestamp: new Date()
     };
 
-    // Update state: Clear suggestions from all previous messages and add user message
     setMessages((prev) => 
-  prev.map(m => ({ ...m, suggestions: undefined } as Message)).concat(userMessage)
-);
+      prev.map(m => ({ ...m, suggestions: undefined } as Message)).concat(userMessage)
+    );
 
     setInput("");
     setLoading(true);
 
     try {
       const res = await axios.post("http://localhost:8000/api/chat", { message: messageText });
-
       const botMessage: Message = {
         id: Date.now() + 1,
         type: "bot",
-        text: res.data.reply || "I'm sorry, I couldn't process that.",
+        text: res.data.reply || "I'm having trouble thinking. Try again?",
         timestamp: new Date(),
-        suggestions: getRandomSuggestions(4, messageText)
+        suggestions: getRandomSuggestions(3, messageText)
       };
-
       setMessages((prev) => [...prev, botMessage]);
-      playNotification();
+      
+      // Only play sound if enabled and the window is actually open
+      if (isSoundEnabled) {
+        playNotification();
+      }
     } catch (error) {
-      console.error("Chat API error:", error);
       setMessages((prev) => [
         ...prev,
-        { id: Date.now() + 1, type: "bot", text: "Connection error. Please try again.", timestamp: new Date() },
+        { id: Date.now() + 1, type: "bot", text: "Something went wrong.", timestamp: new Date() },
       ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   return (
     <>
       <style>{`
-        @keyframes typing-bounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30% { transform: translateY(-5px); opacity: 1; }
+        @keyframes soft-open {
+          0% { transform: translateY(20px) scale(0.95); opacity: 0; }
+          100% { transform: translateY(0) scale(1); opacity: 1; }
         }
-        .chat-bubble-text { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
-        .chat-textarea { resize: none; overflow-y: auto; min-height: 36px; max-height: 120px; line-height: 1.5; }
-
-        /* Floating launcher styles */
-        @keyframes launcher-pulse-ring {
-          0%   { transform: scale(1);    opacity: 0.7; }
-          70%  { transform: scale(1.55); opacity: 0;   }
-          100% { transform: scale(1.55); opacity: 0;   }
+        .q-window {
+           background: #ffffff;
+           border-radius: 40px;
+           box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.2);
+           animation: soft-open 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+           transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .chat-launcher {
-          position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 50;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .chat-launcher-ring {
+        .q-tail {
           position: absolute;
-          inset: 0;
-          border-radius: 9999px;
-          background: rgba(59, 130, 246, 0.45);
-          animation: launcher-pulse-ring 2s ease-out infinite;
-          pointer-events: none;
+          bottom: -8px;
+          right: 35px;
+          width: 30px;
+          height: 20px;
+          background: white;
+          clip-path: polygon(0 0, 100% 0, 50% 100%);
+          z-index: -1;
         }
-        .chat-launcher-btn {
-          position: relative;
-          height: 64px;
-          width: 64px;
-          border-radius: 9999px;
-          background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
-          box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45), 0 2px 8px rgba(0,0,0,0.15);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          border: none;
-          outline: none;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { 
+          background: #e4e4e7; 
+          border-radius: 10px;
         }
-        .chat-launcher-btn:hover {
-          transform: scale(1.1);
-          box-shadow: 0 12px 32px rgba(37, 99, 235, 0.6), 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .chat-launcher-btn:active { transform: scale(0.97); }
-        .chat-launcher-tooltip {
-          position: absolute;
-          right: 72px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: #172554;
-          color: #eff6ff;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          padding: 6px 12px;
-          border-radius: 8px;
-          white-space: nowrap;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 0.2s ease;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-        }
-        .chat-launcher-tooltip::after {
-          content: '';
-          position: absolute;
-          left: 100%;
-          top: 50%;
-          transform: translateY(-50%);
-          border: 6px solid transparent;
-          border-left-color: #172554;
-        }
-        .chat-launcher:hover .chat-launcher-tooltip { opacity: 1; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
       `}</style>
 
       {/* Launcher */}
       {!open && (
-        <div className="chat-launcher">
-          <span className="chat-launcher-ring" aria-hidden="true" />
-            <button
-              id="chat-launcher-btn"
-              aria-label="Open chat support"
-              onClick={() => setOpen(true)}
-              className="chat-launcher-btn"
-            >
-              <RobotAnimation size={52} />
-            </button>
-          <span className="chat-launcher-tooltip">Chat with us!</span>
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end">
+          {showWelcome && (
+            <div className="mb-4 mr-1 bg-zinc-900 text-white px-6 py-4 rounded-[26px] rounded-br-none shadow-2xl border border-zinc-800 text-sm font-medium animate-bounce relative max-w-[220px] text-center leading-tight">
+              <button 
+                onClick={() => setShowWelcome(false)} 
+                className="absolute -top-2 -left-2 bg-blue-600 text-white rounded-full p-1 shadow-lg hover:scale-110 transition-transform"
+              >
+                <X size={10} />
+              </button>
+              Hey! Need help? I'm your Suprathon AI
+              <div className="absolute -bottom-1 right-0 w-3 h-3 bg-zinc-900 [clip-path:polygon(100%_0,0_0,100%_100%)]"></div>
+            </div>
+          )}
+
+          <button 
+            onClick={() => { setOpen(true); setShowWelcome(false); }} 
+            className="h-16 w-16 bg-zinc-900 rounded-[1.8rem] flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 border-4 border-white outline outline-1 outline-zinc-200"
+          >
+            <MessageSquare size={24} className="text-blue-500" />
+          </button>
         </div>
       )}
 
-      {/* Window */}
+      {/* Chat Window */}
       {open && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
-          <div className={`relative flex flex-col bg-background shadow-2xl border border-border overflow-hidden transition-all duration-500 ease-in-out ${isMaximized ? "w-full h-full sm:w-[800px] sm:h-[85vh]" : "w-full h-full sm:w-[420px] sm:h-[600px]"} sm:rounded-[24px]`}>
+        <div className={`fixed z-50 transition-all duration-500 ${isMaximized ? "inset-0 flex items-center justify-center p-4 sm:p-10" : "bottom-12 right-8 w-[calc(100vw-4rem)] sm:w-[420px]"}`}>
+          <div className={`relative q-window flex flex-col border border-zinc-100 overflow-hidden ${isMaximized ? "w-full h-full max-w-6xl shadow-3xl" : "h-[820px] max-h-[92vh] w-full"}`}>
             
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
-              <button onClick={() => setIsMaximized(!isMaximized)} className="p-2 rounded-full hover:bg-muted"><Maximize2 size={16} /></button>
-              <div className="flex gap-2">
-                <button onClick={toggleSound} className="p-2 rounded-full hover:bg-muted">{isSoundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}</button>
-                <button onClick={() => setOpen(false)} className="p-2 rounded-full hover:bg-muted"><X size={18} /></button>
-              </div>
+            {/* Header - Padding adjusted for ChatHeader integration */}
+            <div className="bg-white border-b border-zinc-50">
+              <ChatHeader 
+                isMaximized={isMaximized}
+                setIsMaximized={setIsMaximized}
+                isSoundEnabled={isSoundEnabled}
+                toggleSound={toggleSound}
+                onClose={() => setOpen(false)}
+              />
             </div>
 
-            {/* Body */}
-            <div ref={chatContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-background">
+            {/* Message Body */}
+            <div ref={chatContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 custom-scroll bg-gradient-to-b from-white via-white to-zinc-50/50">
               {messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col ${msg.type === "user" ? "items-end" : "items-start"}`}>
-                  <div className={`flex gap-2 items-start ${msg.type === "user" ? "flex-row-reverse" : "flex-row"} max-w-[85%]`}>
+                <div key={msg.id} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`flex gap-3 max-w-[88%] ${msg.type === "user" ? "flex-row-reverse" : "flex-row"}`}>
                     {msg.type === "bot" && <BotAvatar />}
-                    <div className="flex flex-col gap-1">
-                      <div className={`p-3 text-sm chat-bubble-text shadow-sm ${msg.type === "bot" ? "bg-muted text-foreground rounded-[18px_18px_18px_4px]" : "bg-primary text-primary-foreground rounded-[18px_18px_4px_18px]"}`}>
+                    <div className="flex flex-col gap-2">
+                      <div className={`px-5 py-4 text-[15px] leading-relaxed shadow-sm ${
+                        msg.type === "bot" 
+                        ? "bg-zinc-100 text-zinc-800 rounded-[24px_24px_24px_4px] border border-zinc-200/50" 
+                        : "bg-blue-600 text-white rounded-[24px_24px_4px_24px] shadow-blue-100"
+                      }`}>
                         {renderMessageWithLinks(msg.text)}
                       </div>
+                      
                       {msg.type === "bot" && msg.suggestions && (
-                        <div className="flex flex-wrap gap-2 mt-2">
+                        <div className="flex flex-wrap gap-2 mt-1">
                           {msg.suggestions.map((s, idx) => (
-                            <button key={idx} onClick={() => sendMessage(s)} className="px-3 py-1.5 text-xs font-medium rounded-full border border-primary/30 bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all">
+                            <button key={idx} onClick={() => sendMessage(s)} className="px-5 py-2 text-[13px] font-semibold rounded-full border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all shadow-sm">
                               {s}
                             </button>
                           ))}
                         </div>
                       )}
-                      <span className="text-[10px] text-muted-foreground px-1">{formatTime(msg.timestamp)}</span>
+                      <span className="text-[10px] text-zinc-400 px-2 font-bold uppercase tracking-widest">{formatTime(msg.timestamp)}</span>
                     </div>
                   </div>
                 </div>
@@ -325,29 +286,41 @@ const ChatWidget = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-border bg-card">
-              <div className="flex items-end gap-2">
+            <div className={`bg-white border-t border-zinc-100 transition-all ${isMaximized ? "p-10" : "p-8 pt-4 pb-12"}`}>
+              <div className="flex items-center gap-3 bg-zinc-100 rounded-[2.5rem] p-2 pr-3 focus-within:bg-white focus-within:ring-2 ring-blue-500/20 transition-all border border-transparent focus-within:border-zinc-200">
                 <textarea
                   ref={textareaRef}
-                  placeholder="Ask me something..."
+                  rows={1}
+                  placeholder="Ask me anything..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="chat-textarea flex-1 rounded-2xl border border-input bg-background px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())}
+                  className="flex-1 bg-transparent px-5 py-3 text-[14px] outline-none resize-none max-h-[150px] text-zinc-900 placeholder:text-zinc-400 font-medium"
                 />
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || loading}
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all ${input.trim() && !loading ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground"}`}
+                  className={`h-12 w-12 flex items-center justify-center rounded-full transition-all ${
+                    input.trim() && !loading ? "bg-zinc-900 text-blue-500 shadow-xl scale-100 active:scale-90" : "bg-zinc-200 text-zinc-400"
+                  }`}
                 >
-                  <SendHorizontal size={18} />
+                  <SendHorizontal size={22} />
                 </button>
+              </div>
+              <div className="flex justify-center items-center gap-2 mt-6 opacity-40">
+                <div className="h-1 w-1 rounded-full bg-blue-600"></div>
+                <p className="text-[10px] text-zinc-900 font-bold tracking-[0.2em] uppercase">Secured by Suprathon AI</p>
               </div>
             </div>
 
+            {!isMaximized && <div className="q-tail" />}
+
             {showScrollBtn && (
-              <button onClick={() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" })} className="absolute right-6 bottom-24 bg-primary text-white p-2 rounded-full shadow-lg animate-bounce">
-                <ArrowDown size={16} />
+              <button 
+                onClick={() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" })} 
+                className="absolute right-8 bottom-44 bg-zinc-900 text-blue-500 p-3 rounded-full shadow-2xl hover:bg-black transition-all animate-bounce z-10 border border-zinc-700"
+              >
+                <ArrowDown size={20} />
               </button>
             )}
           </div>
