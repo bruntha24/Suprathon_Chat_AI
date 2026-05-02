@@ -53,46 +53,46 @@ const ChatHeader = ({
           {/* Back bubble */}
           <div className="absolute -left-1 -bottom-1 h-7 w-7 rounded-full bg-blue-400/20 blur-sm" />
 
-          {/* Main */}
-          <div className="relative h-10 w-10 rounded-full 
-            bg-gradient-to-br from-[#111827] to-[#1f2937] 
-            flex items-center justify-center 
-            shadow-[0_6px_20px_rgba(0,0,0,0.4)] 
-            border border-white/10">
+          {/* Main Animation Container */}
+          <div className="relative h-10 w-10 rounded-full overflow-hidden bg-[#4B0082] shadow-[0_6px_20px_rgba(0,0,0,0.4)] border border-white/10">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/assets/animations/robot_greeting_final.mp4" type="video/mp4" />
+              <img src="/assets/animations/robot_greeting_final.gif" alt="Robot Greeting" />
+            </video>
+          </div>
 
-            {/* Highlight */}
-            <div className="absolute top-1 left-2 w-4 h-1.5 bg-white/10 rounded-full blur-[1px]" />
-
-            <BotIcon size={18} className="text-blue-300" />
-
-            {/* Badge */}
-            <div className="absolute -top-1 -right-1 h-5 w-5 
-              bg-blue-500 text-white text-[10px] font-semibold 
-              flex items-center justify-center rounded-full 
-              border border-[#020617] shadow-md">
-              1
-            </div>
+          {/* Badge */}
+          <div className="absolute -top-1 -right-1 h-5 w-5 
+            bg-blue-500 text-white text-[10px] font-semibold 
+            flex items-center justify-center rounded-full 
+            border border-[#020617] shadow-md">
+            1
           </div>
         </div>
 
         {/* TEXT */}
-       {/* TEXT */}
-<div className="flex flex-col leading-tight">
-  <h3 className="text-sm font-semibold text-white tracking-wide">
-    Suprathon Ai
-  </h3>
+        <div className="flex flex-col leading-tight">
+          <h3 className="text-sm font-semibold text-white tracking-wide">
+            Suprathon Ai
+          </h3>
 
-  <p className="text-[10px] text-slate-400 font-medium tracking-wide mt-0.5">
-    Helping you navigate Suprathon
-  </p>
+          <p className="text-[10px] text-slate-400 font-medium tracking-wide mt-0.5">
+            Helping you navigate Suprathon
+          </p>
 
-  <div className="flex items-center gap-1 mt-1">
-    <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
-    <p className="text-[10px] text-slate-500 font-medium">
-      Online
-    </p>
-  </div>
-</div>
+          <div className="items-center gap-1 mt-1 flex">
+            <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
+            <p className="text-[10px] text-slate-500 font-medium">
+              Online
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* RIGHT ACTIONS */}

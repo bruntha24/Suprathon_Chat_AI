@@ -61,9 +61,24 @@ const renderMessageWithLinks = (text: string) => {
 };
 
 // --- SUB-COMPONENTS ---
+const RobotAnimation = ({ className, size = "full" }: { className?: string; size?: string }) => (
+  <div className={`relative overflow-hidden rounded-full bg-[#4B0082] flex items-center justify-center ${className}`}>
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="w-full h-full object-cover"
+    >
+      <source src="/assets/animations/robot_greeting_final.mp4" type="video/mp4" />
+      <img src="/assets/animations/robot_greeting_final.gif" alt="Robot Greeting" />
+    </video>
+  </div>
+);
+
 const BotAvatar = () => (
-  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 shadow-lg shadow-zinc-200">
-    <BotIcon size={18} className="text-blue-500" />
+  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 shadow-lg shadow-zinc-200 overflow-hidden border border-zinc-800">
+    <RobotAnimation className="w-full h-full" />
   </div>
 );
 
@@ -229,9 +244,9 @@ const ChatWidget = () => {
 
           <button 
             onClick={() => { setOpen(true); setShowWelcome(false); }} 
-            className="h-16 w-16 bg-zinc-900 rounded-[1.8rem] flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 border-4 border-white outline outline-1 outline-zinc-200"
+            className="h-20 w-20 bg-zinc-900 rounded-[2rem] flex items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 border-4 border-white outline outline-1 outline-zinc-200 overflow-hidden"
           >
-            <MessageSquare size={24} className="text-blue-500" />
+            <RobotAnimation className="w-[110%] h-[110%]" />
           </button>
         </div>
       )}
