@@ -85,13 +85,24 @@ const BotAvatar = () => (
 );
 
 const TypingIndicator = () => (
-  <div className="flex gap-3 items-start px-2">
-    <BotAvatar />
-    <div className="bg-zinc-100/80 backdrop-blur-sm p-4 rounded-3xl rounded-tl-none shadow-sm border border-white">
-      <div className="flex items-center gap-1.5 h-3">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="block h-1.5 w-1.5 rounded-full bg-zinc-400 animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />
-        ))}
+  <div className="flex justify-start animate-in fade-in duration-300">
+    <div className="flex gap-3 max-w-[88%] flex-row">
+      <BotAvatar />
+      <div className="flex flex-col gap-2">
+        <div className="px-5 py-4 shadow-sm bg-zinc-100 rounded-[24px_24px_24px_4px] border border-zinc-200/50 flex items-center justify-center min-h-[56px] min-w-[72px]">
+          <div className="flex items-center gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <span 
+                key={i} 
+                className="block h-2 w-2 rounded-full bg-zinc-400" 
+                style={{ 
+                  animation: 'typing-dot 1.4s infinite ease-in-out both', 
+                  animationDelay: `${i * 0.16}s` 
+                }} 
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -113,7 +124,7 @@ const ChatWidget = () => {
     },
   ]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
 
   const { isSoundEnabled, toggleSound, playNotification } = useChatSound();
@@ -127,7 +138,7 @@ const ChatWidget = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, loading, scrollToBottom]);
+  }, [messages, isTyping, scrollToBottom]);
 
   const resizeTextarea = useCallback(() => {
     const ta = textareaRef.current;
@@ -147,7 +158,7 @@ const ChatWidget = () => {
 
   const sendMessage = async (textOverride?: string) => {
     const messageText = textOverride || input.trim();
-    if (!messageText || loading) return;
+    if (!messageText || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -162,10 +173,14 @@ const ChatWidget = () => {
     });
 
     setInput("");
-    setLoading(true);
+    setIsTyping(true);
 
     try {
-      const res = await axios.post("http://localhost:8000/api/chat", { message: messageText });
+      const [res] = await Promise.all([
+        axios.post("http://localhost:8000/api/chat", { message: messageText }),
+        new Promise(resolve => setTimeout(resolve, 1500))
+      ]);
+      
       const botMessage: Message = {
         id: Date.now() + 1,
         type: "bot",
@@ -180,7 +195,7 @@ const ChatWidget = () => {
     } catch (error) {
       setMessages((prev) => [...prev, { id: Date.now() + 1, type: "bot", text: "Something went wrong.", timestamp: new Date() }]);
     } finally {
-      setLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -194,6 +209,10 @@ const ChatWidget = () => {
   @keyframes soft-open {
     0% { transform: translateY(20px) scale(0.95); opacity: 0; }
     100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  @keyframes typing-dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-3px); opacity: 1; }
   }
   .q-window {
      background: #ffffff;
@@ -273,7 +292,7 @@ const ChatWidget = () => {
                   </div>
                 </div>
               ))}
-              {loading && <TypingIndicator />}
+              {isTyping && <TypingIndicator />}
               <div ref={chatEndRef} />
 
               {/* CIRCULAR SCROLL BUTTON */}
@@ -294,8 +313,8 @@ const ChatWidget = () => {
                 />
                 <button
                   onClick={() => sendMessage()}
-                  disabled={!input.trim() || loading}
-                  className={`h-12 w-12 flex items-center justify-center rounded-full transition-all ${input.trim() && !loading ? "bg-zinc-900 text-blue-500 shadow-xl scale-100 active:scale-90" : "bg-zinc-200 text-zinc-400"}`}
+                  disabled={!input.trim() || isTyping}
+                  className={`h-12 w-12 flex items-center justify-center rounded-full transition-all ${input.trim() && !isTyping ? "bg-zinc-900 text-blue-500 shadow-xl scale-100 active:scale-90" : "bg-zinc-200 text-zinc-400"}`}
                 >
                   <SendHorizontal size={22} />
                 </button>
