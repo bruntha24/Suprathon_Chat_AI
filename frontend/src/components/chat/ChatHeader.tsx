@@ -77,7 +77,7 @@ const ChatHeader = ({
         </div>
 
         {/* TEXT */}
-        <div className="flex flex-col leading-tight">
+        <div className="flex flex-col leading-tight justify-center">
           <h3 className="text-sm font-semibold text-white tracking-wide">
             Suprathon Ai
           </h3>
@@ -85,13 +85,6 @@ const ChatHeader = ({
           <p className="text-[10px] text-slate-400 font-medium tracking-wide mt-0.5">
             Helping you navigate Suprathon
           </p>
-
-          <div className="items-center gap-1 mt-1 flex">
-            <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
-            <p className="text-[10px] text-slate-500 font-medium">
-              Online
-            </p>
-          </div>
         </div>
       </div>
 
